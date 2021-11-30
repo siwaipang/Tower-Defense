@@ -1,5 +1,3 @@
-# from dice import *
-    
 def setup():
     fullScreen()
     
@@ -67,44 +65,29 @@ def drawLeftMenu():
     image(img_exit, 50, 50, 92, 101)
     image(img_settings, 167, 50, 92, 101)
     
-def changeCursorToPointer():
-    # when hovering over button, the cursor will change to a pointer
-    if (mouseX > 50 and mouseX < 142 and mouseY > 50 and mouseY < 151) or (mouseX > 167 and mouseX < 259 and mouseY > 50 and mouseY < 151) or \
-        (mouseX > 811 and mouseX < 1101 and mouseY > 936 and mouseY < 1046):
-        cursor(HAND)
-    else:
-        cursor(ARROW)
-
-def changeCursorToText():
+def changeCursor():
     # when hovering over textfield, the cursor will change to a text cursor
     if (mouseX > 835 and mouseX < 1235 and mouseY > height/2.19 and mouseY < 560) or (mouseX > 835 and mouseX < 1235 and mouseY > height/1.89 and mouseY < 640) or \
         (mouseX > 835 and mouseX < 1235 and mouseY > height/1.66 and mouseY < 720) or (mouseX > 835 and mouseX < 1235 and mouseY > height/1.48 and mouseY < 800):
         cursor(TEXT)
+        
+    # when hovering over button, the cursor will change to a pointer
+    elif (mouseX > 50 and mouseX < 142 and mouseY > 50 and mouseY < 151) or (mouseX > 167 and mouseX < 259 and mouseY > 50 and mouseY < 151) or \
+        (mouseX > 811 and mouseX < 1101 and mouseY > 936 and mouseY < 1046):
+        cursor(HAND)
     else:
         cursor(ARROW)
         
-def drawPlayerList():
-    # if player_list == 1:
-    textAlign(LEFT)
-    text('1. ' + gamer_names[0], width/1.5, height/2.4)
-    text('2. ' + gamer_names[1], width/1.5, height/2.2)
-    text('3. ' + gamer_names[2], width/1.5, height/2)
-    text('4. ' + gamer_names[3], width/1.5, height/1.8)
-    # else:
-    #     fill('transparent')
-    
-    
+
+
 def draw():
     drawBackground()
     drawLogo()
-    changeCursorToPointer()
-    changeCursorToText()
+    changeCursor()
     drawEnterNamesText()
     drawInputEnterNames()
     drawStartBtn()
     drawLeftMenu()
-    drawPlayerList()
-    
     
 def mousePressed():
     global player_list
@@ -115,9 +98,8 @@ def mousePressed():
         fill(0)
         rect(167, 50, 92, 101)
     if mouseX > 811 and mouseX < 1101 and mouseY > 936 and mouseY < 1046: # start button
-        fill(255)
+        fill(0)
         rect(811, 936, 290, 110)
-    
      
 def keyPressed():
     global gamer_names, allowed_characters

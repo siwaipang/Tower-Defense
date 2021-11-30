@@ -4,7 +4,7 @@ def setup():
     fullScreen()
     
     # create font
-    global font_kabel, gamer_names, player_list
+    global font_kabel
     font_kabel = loadFont('LeelawadeeUI-Bold-48.vlw')
     
     #loading image
@@ -15,7 +15,9 @@ def setup():
     img_exit = loadImage('exit.png')
     img_settings = loadImage('settings.png')
     
-    player_list = gamer_names
+    # create player list
+    global gamer_names
+    gamer_names = ['Si Wai', 'Lucas', 'Sven', 'Anton']
     
 def drawBackground():
     global img_bg
@@ -44,50 +46,27 @@ def drawLeftMenu():
     image(img_settings, 167, 50, 92, 101)
     
 def changeCursorToPointer():
-    # when hovering over button, the cursor will change to a pointer
     if (mouseX > 50 and mouseX < 142 and mouseY > 50 and mouseY < 151) or (mouseX > 167 and mouseX < 259 and mouseY > 50 and mouseY < 151) or \
         (mouseX > 811 and mouseX < 1101 and mouseY > 936 and mouseY < 1046):
         cursor(HAND)
     else:
         cursor(ARROW)
-
-def changeCursorToText():
-    # when hovering over textfield, the cursor will change to a text cursor
-    if (mouseX > 835 and mouseX < 1235 and mouseY > height/2.19 and mouseY < 560) or (mouseX > 835 and mouseX < 1235 and mouseY > height/1.89 and mouseY < 640) or \
-        (mouseX > 835 and mouseX < 1235 and mouseY > height/1.66 and mouseY < 720) or (mouseX > 835 and mouseX < 1235 and mouseY > height/1.48 and mouseY < 800):
-        cursor(TEXT)
-    else:
-        cursor(ARROW)
         
 def drawPlayerList():
-    player_amount = 1
-    max_players = 4
-    h_height = 400
-    player_number = 0
-    iteration = 0
-    players_list = ''
-    while player_amount <= max_players:
-        players_list += str(player_amount) + '. '
-        while iteration <= player_number:
-            players_list += str(players[player_number]) + ' \n\n'
-            iteration += 1
-        player_number += 1
-        player_amount += 1
-        
-    text(str(players_list), width/2, height/2)
+    global gamer_names
+    text('1. ' + gamer_names[0], width/2, height/2)
+    text('2. ' + gamer_names[1], width/2, height/1.7)
+    text('3. ' + gamer_names[2], width/2, height/1.47)
+    text('4. ' + gamer_names[3], width/2, height/1.3)
     
 def draw():
     drawBackground()
     drawLogo()
     changeCursorToPointer()
-    changeCursorToText()
     drawEnterNames()
-
-
+    drawPlayerList()
     drawStartBtn()
     drawLeftMenu()
-    # display version text
-    # text('VERSION 1.1', 50, height/1.05)
     
 def mousePressed():
     if mouseX > 50 and mouseX < 142 and mouseY > 50 and mouseY < 151: # exit button
