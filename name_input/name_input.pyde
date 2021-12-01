@@ -8,6 +8,10 @@ def setup():
     # create font
     global font_kabel
     font_kabel = loadFont('LeelawadeeUI-Bold-48.vlw')
+    
+    # create cursor
+    global img_cursor
+    img_cursor = loadImage('cursor.png')
 
     #loading image
     global img_logo, img_bg, img_round, img_exit
@@ -97,18 +101,23 @@ def drawRound(title):
     fill('#1dc2ce')
     text(title, 938, 112)
     
+def drawPlayerList():
+    global gamer_names
+    text('1. ' + gamer_names[0], width/2, height/2.1)
+    text('2. ' + gamer_names[1], width/2, height/1.8)
+    text('3. ' + gamer_names[2], width/2, height/1.57)
+    text('4. ' + gamer_names[3], width/2, height/1.4)
+    
+def drawThrowDiceBtn():
+    global img_round
+    image(img_round, width/2.36, height/1.15, 290, 110)
+    fill(255)
+    textFont(font_kabel, 25)
+    text('THROW DICE', width/2, height/1.08)
+    
 def changeCursor():
-    # when hovering over textfield, the cursor will change to a text cursor
-    if (mouseX > 835 and mouseX < 1235 and mouseY > height/2.19 and mouseY < 560) or (mouseX > 835 and mouseX < 1235 and mouseY > height/1.89 and mouseY < 640) or \
-        (mouseX > 835 and mouseX < 1235 and mouseY > height/1.66 and mouseY < 720) or (mouseX > 835 and mouseX < 1235 and mouseY > height/1.48 and mouseY < 800):
-        cursor(TEXT)
-        
-    # when hovering over button, the cursor will change to a pointer
-    elif (mouseX > 50 and mouseX < 142 and mouseY > 50 and mouseY < 151) or (mouseX > 167 and mouseX < 259 and mouseY > 50 and mouseY < 151) or \
-        (mouseX > 811 and mouseX < 1101 and mouseY > 936 and mouseY < 1046):
-        cursor(HAND)
-    else:
-        cursor(ARROW)
+    global img_cursor
+    cursor(img_cursor)
 
 def draw():
     drawBackground()
@@ -122,8 +131,10 @@ def draw():
     if currentScreen == 'DICE':
         drawBackground()
         drawLeftMenu()
+        drawLogo()
+        drawPlayerList()
+        drawThrowDiceBtn()
         drawBackButton()
-        drawRound('DICES')
         
     ## EXIT SCREEN
     elif currentScreen == 'EXIT':
