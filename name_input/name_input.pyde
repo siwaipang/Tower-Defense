@@ -1,6 +1,8 @@
 from mainscreen import *
+import random
 
 currentScreen = 'NAME_INPUT'
+current_round = 0
 def setup():
     # size(1920, 1080)
     fullScreen()
@@ -34,7 +36,7 @@ def setup():
     img_btn_number = loadImage('btn_number.png')
     
     # input gamer names
-    global gamer_names, allowed_characters, gamer_one, gamer_two, gamer_three, gamer_four
+    global gamer_names, allowed_characters
     gamer_one = ''
     gamer_two = ''
     gamer_three = ''
@@ -43,6 +45,22 @@ def setup():
     allowed_characters = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", \
                           "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", \
                           "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"}
+    
+    # create random number between 2 and 12
+    global min_number, max_number, number
+    min_number = 2
+    max_number = 12
+    number = random.randint(min_number, max_number)
+    
+    # loading dice images
+    global img_dice
+    img_dice_1 = loadImage('dices/dice_1.png')
+    img_dice_2 = loadImage('dices/dice_2.png')
+    img_dice_3 = loadImage('dices/dice_3.png')
+    img_dice_4 = loadImage('dices/dice_4.png')
+    img_dice_5 = loadImage('dices/dice_5.png')
+    img_dice_6 = loadImage('dices/dice_6.png')
+    img_dice = [img_dice_1, img_dice_2, img_dice_3, img_dice_4, img_dice_5, img_dice_6]
 
 def drawBackground():
     global img_bg
@@ -118,7 +136,68 @@ def drawThrowDiceBtn():
 def changeCursor():
     global img_cursor
     cursor(img_cursor)
+    
+# displays the dice numbers when user throws the dice
+def throwDice():
+    global img_dice, number
+    if number == 2:
+        image(img_dice[0], width/3, height/2.2)
+        image(img_dice[0], width/1.9, height/2.2)
+    elif number == 3:
+        image(img_dice[1], width/3, height/2.2)
+        image(img_dice[0], width/1.9, height/2.2)
+    elif number == 4:
+        image(img_dice[1], width/3, height/2.2)
+        image(img_dice[1], width/1.9, height/2.2)
+    elif number == 5:
+        image(img_dice[2], width/3, height/2.2)
+        image(img_dice[1], width/1.9, height/2.2)
+    elif number == 6:
+        image(img_dice[2], width/3, height/2.2)
+        image(img_dice[2], width/1.9, height/2.2)
+    elif number == 7:
+        image(img_dice[3], width/3, height/2.2)
+        image(img_dice[2], width/1.9, height/2.2)
+    elif number == 8:
+        image(img_dice[3], width/3, height/2.2)
+        image(img_dice[3], width/1.9, height/2.2)
+    elif number == 9:
+        image(img_dice[4], width/3, height/2.2)
+        image(img_dice[3], width/1.9, height/2.2)
+    elif number == 10:
+        image(img_dice[4], width/3, height/2.2)
+        image(img_dice[4], width/1.9, height/2.2)
+    elif number == 11:
+        image(img_dice[5], width/3, height/2.2)
+        image(img_dice[4], width/1.9, height/2.2)
+    elif number == 12:
+        image(img_dice[5], width/3, height/2.2)
+        image(img_dice[5], width/1.9, height/2.2)
 
+def nextPlayer():
+    global img_round
+    image(img_round, width/2.36, height/1.15, 290, 110)
+    fill(255)
+    textAlign(CENTER)
+    if current_round < 4:
+        text('NEXT PLAYER', width/2, height/1.08)
+    else:
+        text('START GAME', width/2, height/1.08)
+        
+# displays the text: 'user throws number'
+def playerThrowsNumber():
+    global gamer_names, current_round, number
+    if current_round == 0:
+        text(gamer_names[0] + ' throws ' + str(number), width/2, height/2.5)
+    elif current_round == 1:
+        text(gamer_names[1] + ' throws ' + str(number), width/2, height/2.5)
+    elif current_round == 2:
+        text(gamer_names[2] + ' throws ' + str(number), width/2, height/2.5)
+    elif current_round == 3:
+        text(gamer_names[3] + ' throws ' + str(number), width/2, height/2.5)
+    else:
+        text('Please start game', width/2, height/2.5)
+       
 def draw():
     drawBackground()
     drawLogo()
@@ -130,11 +209,27 @@ def draw():
     
     if currentScreen == 'DICE':
         drawBackground()
-        drawLeftMenu()
         drawLogo()
+        drawLeftMenu()
         drawPlayerList()
         drawThrowDiceBtn()
         drawBackButton()
+        
+    ## THROW DICES SCREEN
+    elif currentScreen == 'THROW_DICES':
+        drawBackground()
+        drawLogo()
+        drawLeftMenu()
+        drawBackButton()
+        fill('#1a2236')
+        noStroke()
+        rect(460, 390, 1000, 400, 10)
+        textAlign(CENTER, CENTER)
+        fill('#1dc2ce')
+        playerThrowsNumber()
+        throwDice()
+        textFont(font_kabel, 25)
+        nextPlayer()
         
     ## EXIT SCREEN
     elif currentScreen == 'EXIT':
@@ -155,14 +250,15 @@ def draw():
         drawBackButton()
         drawRound('SETTINGS')
     
-def mousePressed():
-    global player_list, currentScreen
+def mousePressed():            
+    global player_list, currentScreen, number, current_round
     if mouseX > 50 and mouseX < 142 and mouseY > 50 and mouseY < 151: # EXIT BUTTON
         currentScreen = 'EXIT'
     if mouseX > 167 and mouseX < 259 and mouseY > 50 and mouseY < 151: # SETTINGS BUTTON
         currentScreen = 'SETTINGS'
-    if mouseX > 811 and mouseX < 1101 and mouseY > 936 and mouseY < 1046: # START BUTTON
-        currentScreen = 'DICE'
+    if currentScreen == 'NAME_INPUT':
+        if mouseX > 811 and mouseX < 1101 and mouseY > 936 and mouseY < 1046: # START BUTTON
+            currentScreen = 'DICE'
         
     ## DICE SCREEN
     elif currentScreen == 'DICE':
@@ -174,7 +270,22 @@ def mousePressed():
             currentScreen = 'SETTINGS'
         if mouseX > 284 and mouseX < 376 and mouseY > 50 and mouseY < 151: # RULES BUTTON
             currentScreen = 'RULES'
-        
+        if mouseX > 811 and mouseX < 1101 and mouseY > 936 and mouseY < 1046: # THROW_DICES BUTTON
+            currentScreen = 'THROW_DICES'
+            
+    ## THROW DICES SCREEN
+    elif currentScreen == 'THROW_DICES':
+        if mouseX > 811 and mouseX < 1101 and mouseY > 936 and mouseY < 1046: # NEXT PLAYER
+            current_round += 1
+            if current_round < 4:
+                number = random.randint(min_number, max_number)
+        if mouseX > 1666 and mouseX < 1870 and mouseY > 50 and mouseY < 137: # BACK BUTTON
+            currentScreen = 'DICE'
+        if mouseX > 50 and mouseX < 142 and mouseY > 50 and mouseY < 151: # EXIT BUTTON
+            currentScreen = 'EXIT'
+        if mouseX > 167 and mouseX < 259 and mouseY > 50 and mouseY < 151: # SETTINGS BUTTON
+            currentScreen = 'SETTINGS'
+            
     ## EXIT SCREEN
     elif currentScreen == 'EXIT':
         if mouseX > 725 and mouseX < 929 and mouseY > 550 and mouseY < 637: # EXIT BUTTON
@@ -239,4 +350,3 @@ def keyPressed():
             gamer_names[3] = gamer_names[3][:-1]
         if key == DELETE:
             gamer_names[3] = ''
-            
