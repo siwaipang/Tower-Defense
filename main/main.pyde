@@ -277,22 +277,23 @@ def nextPlayer():
     textAlign(CENTER)
     if current_round < 4:
         image(img_btn_next, width/2.36, height/1.15, 204, 87)
-    else:
-        image(img_btn_next, width/2.36, height/1.15, 204, 87)
-        # text('START GAME', width/2, height/1.08)
         
 # displays the text: 'user throws number'
 def playerThrowsNumber():
-    global gamer_names, current_round, number, thrownNumbers
+    global gamer_names, current_round, number, playersAdded, playerName
     fill('#1dc2ce')
     if current_round == 0:
         text(gamer_names[0] + ' throws ' + str(number), width/2, height/2.1)
+        playerName = gamer_names[0]
     elif current_round == 1:
         text(gamer_names[1] + ' throws ' + str(number), width/2, height/2.1)
+        playerName = gamer_names[1]
     elif current_round == 2:
         text(gamer_names[2] + ' throws ' + str(number), width/2, height/2.1)
+        playerName = gamer_names[2]
     elif current_round == 3:
         text(gamer_names[3] + ' throws ' + str(number), width/2, height/2.1)
+        playerName = gamer_names[3]
     
 def drawPlayerCards():
     if players[1]['isDead'] == False:
@@ -536,13 +537,13 @@ def drawStartMenu():
     textSize(24)
     textAlign(LEFT)
     text('VERSION 0.0', 20, 1060)
-
+    
 ## BUTTONS
 def mousePressed():
     
     ## GLOBALS
     global currentRound, currentScreen, currentPlayer, activePlayers, enteredPlayers, currentEntering
-    global player_list, currentScreen, number, current_round, lastScreen, gamer_names, shuffled, tooltips, thrownNumbers
+    global player_list, currentScreen, number, current_round, lastScreen, gamer_names, shuffled, tooltips, thrownNumbers, playerName
     
     ## MAIN MENU
     if currentScreen == 'MAIN-MENU':
@@ -805,32 +806,28 @@ def mousePressed():
         if mouseX > 1780 and mouseX < 1795 and mouseY > 915 and mouseY < 930: # PLAYER 4 PLUS BUTTON
             if players[4]['health'] != 3:
                 players[4]['health']+= 1
-                
+                          
     ## THROW DICES SCREEN
     elif currentScreen == 'THROW_DICES':
         if mouseX > 811 and mouseX < 1101 and mouseY > 936 and mouseY < 1046: # NEXT PLAYER
             current_round += 1
+            thrownNumbers.append(number) # add thrown amount to list
             if current_round < playersAdded:
                 number = random.randint(min_number, max_number)
-                thrownNumbers.append(number)
             else:
                 shuffled = True
-                gamer_names = thrownNumbers
-                # gamer_names = list(filter(None, gamer_names))
-                # gamer_names = sorted(gamer_names)
+                gamer_names = list(filter(None, gamer_names))
+                random.shuffle(gamer_names)
+                # gamer_names = sorted(thrownNumbers, reverse=True) # sort list by number, most to least
                 currentScreen = 'BEGIN'
-            # while current_round < playersAdded:
-            #     number = random.randint(min_number, max_number)
-            #     # thrownNumbers.append(number)
-            #     current_round += 1
-            # gamer_names = thrownNumbers
-            # gamer_names = sorted(gamer_names, reverse=True)
-            # currentScreen = 'BEGIN'
                 
     ## PLAYER WHO WILL BEGIN FIRST SCREEN
     elif currentScreen == 'BEGIN':
         if mouseX > 811 and mouseX < 1101 and mouseY > 936 and mouseY < 1046: # START GAME
-            currentScreen = 'MAIN'
+            addPlayers()
+            currentScreen = 'MAIN' 
+            lastScreen = 'MAIN'
+            currentPlayer = 1
             
     ## TROOP SCREEN
     elif currentScreen == 'TROOPS':
