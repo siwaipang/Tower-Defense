@@ -66,34 +66,34 @@ diceGained = {
                   }
               }
 
-tooltips = {'notEnoughPlayers': False}
+tooltips = {'notEnoughPlayers': False, 'notEnoughPoints': False}
 
 players = {
                1: {
                    'name': '',
                    'health': 3,
-                   'points': 10,
+                   'points': 0,
                    'cards': [],
                    'isDead': True
                    },
                 2: {
                    'name': '',
                    'health': 3,
-                   'points': 10,
+                   'points': 0,
                    'cards': [],
                    'isDead': True
                    },
                 3: {
                    'name': '',
                    'health': 3,
-                   'points': 10,
+                   'points': 0,
                    'cards': [],
                    'isDead': True
                    },
                 4: {
                    'name': '',
                    'health': 3,
-                   'points': 10,
+                   'points': 0,
                    'cards': [],
                    'isDead': True
                    }
@@ -102,15 +102,20 @@ players = {
 def setup():
     fullScreen()
     #size(1920, 1080)
-
     
     ## SOUND
-    global sf, sfx
-    sf = SoundFile(this,"themesong.mp3")
-    sf.play()
+    global sf, sfx, buysfx, winsfx, notisfx
+    sf = SoundFile(this,"themesong.wav")
+    sf.loop()
     sf.amp(0.6)
     sfx = SoundFile(this,"clickingnoise.wav")
-    sfx.amp(0.6) 
+    sfx.amp(0.6)
+    buysfx = SoundFile(this,"buyingnoise.wav")
+    buysfx.amp(0.6)
+    winsfx = SoundFile(this,"winningnoise.wav")
+    winsfx.amp(0.6)
+    notisfx = SoundFile(this,"notificationnoise.wav")
+    notisfx.amp(0.6) 
     
     ## PLAYERCARDS
     global img_playercard, img_playercard_dead
@@ -118,11 +123,12 @@ def setup():
     img_playercard_dead = loadImage('playercard_dead.png')
     
     ## TROOPS
-    global img_background_troops
+    global img_background_troops, img_background_secondary
     global img_skeleton_white, img_skeleton_blue, img_archer_white, img_archer_blue, img_dwarf_white, img_dwarf_blue
     global img_cannon_white, img_cannon_blue, img_giant_white, img_giant_blue, img_wizard_white, img_wizard_blue
     global img_witch_white, img_witch_blue, img_golem_white, img_golem_blue, img_dragon_white, img_dragon_blue
     
+    img_background_secondary = loadImage('background_secondary.png')
     img_background_troops = loadImage('background_troops.png')
     img_skeleton_white = loadImage('skeleton_white.png')
     img_skeleton_blue = loadImage('skeleton_blue.png')
@@ -158,10 +164,13 @@ def setup():
     board_n = loadImage('board.png')
     
     ## CARDS
-    global img_all_cards, img_btn_buy, img_btn_buy_small
+    global img_all_cards, img_btn_buy, img_btn_buy_small, img_btn_menu
+    global playingCards, img_card_counter, img_card_exchange, img_card_exterminate, img_card_extramile, img_card_ghost, img_card_heal, img_card_kamikaze, img_card_multihit, img_card_mutiny, img_card_ghost, img_card_refund, img_card_reversal
+    global img_card_shield, img_card_skip, img_card_switcheroo, img_card_take   
     img_all_cards = loadImage('all_cards.png')
     img_btn_buy = loadImage('btn_buy.png')
     img_btn_buy_small = loadImage('btn_buy_small.png')
+    img_btn_menu = loadImage('btn_menu.png')
     
     img_card_counter = loadImage('card_counter.png')
     img_card_exchange = loadImage('card_exchange.png')
@@ -179,8 +188,7 @@ def setup():
     img_card_skip = loadImage('card_skip.png')
     img_card_switcheroo = loadImage('card_switcheroo.png')
     img_card_take = loadImage('card_take.png')
-                
-    global playingCards
+         
     playingCards = {
              1: {
                  'img': img_card_counter,
@@ -193,7 +201,7 @@ def setup():
                  'img': img_card_exchange,
                  'name': 'Exchange',
                  'taken': False,
-                 'drawn': 0,
+                 'drawn': 3,
                  'max': 3
                  },
              3: {
@@ -380,6 +388,219 @@ def setup():
             }
     
 
+def resetGame():
+    global currentScreen, lastScreen, currentRound, currentPlayer, activePlayers, enteredPlayers, amountGained, shuffled, gamer_one, gamer_two, gamer_three, gamer_four, gamer_names
+    global currentEntering, current_round, amountOne, amountTwo, thrownDice, isPlaying, notifications, soundfx, troopSelected, selectedTroopPoints, diceGained, tooltips, players
+    
+    currentScreen = 'MAIN-MENU'
+    lastScreen = 'MAIN-MENU'
+    currentRound = 'POINTS'
+    currentPlayer = 0
+    activePlayers = []
+    enteredPlayers = 0
+    amountGained = 0
+    
+    ## INPUT NAMES AND DICE
+    shuffled = False
+    gamer_one = ''
+    gamer_two = ''
+    gamer_three = ''
+    gamer_four = ''
+    gamer_names = [gamer_one, gamer_two, gamer_three, gamer_four]
+    
+    currentEntering = 1
+    current_round = 0
+    
+    # SHUFFLE
+    amountOne = 0
+    amountTwo = 0
+    thrownDice = False
+    
+    # SETTINGS
+    isPlaying = True
+    notifications = True
+    soundfx = True
+    
+    # TROOPS
+    troopSelected = ''
+    selectedTroopPoints = 0
+    
+    diceGained = {
+                1: {
+                    'name': '',
+                    'dice1': 0,
+                    'dice2': 0,
+                    'total': 0
+                    },
+                2: {
+                    'name': '',
+                    'dice1': 0,
+                    'dice2': 0,
+                    'total': 0
+                    },
+                3: {
+                    'name': '',
+                    'dice1': 0,
+                    'dice2': 0,
+                    'total': 0
+                    },
+                4: {
+                    'name': '',
+                    'dice1': 0,
+                    'dice2': 0,
+                    'total': 0
+                    }
+                }
+    
+    tooltips = {'notEnoughPlayers': False, 'notEnoughPoints': False}
+    
+    players = {
+                1: {
+                    'name': '',
+                    'health': 3,
+                    'points': 0,
+                    'cards': [],
+                    'isDead': True
+                    },
+                    2: {
+                    'name': '',
+                    'health': 3,
+                    'points': 0,
+                    'cards': [],
+                    'isDead': True
+                    },
+                    3: {
+                    'name': '',
+                    'health': 3,
+                    'points': 0,
+                    'cards': [],
+                    'isDead': True
+                    },
+                    4: {
+                    'name': '',
+                    'health': 3,
+                    'points': 0,
+                    'cards': [],
+                    'isDead': True
+                    }
+                }
+    
+    global playingCards, img_card_counter, img_card_exchange, img_card_exterminate, img_card_extramile, img_card_ghost, img_card_heal, img_card_kamikaze, img_card_multihit, img_card_mutiny, img_card_ghost, img_card_refund, img_card_reversal
+    global img_card_shield, img_card_skip, img_card_switcheroo, img_card_take
+    playingCards = {
+             1: {
+                 'img': img_card_counter,
+                 'name': 'Counter',
+                 'taken': False,
+                 'drawn': 0,
+                 'max': 1
+                 },
+             2: {
+                 'img': img_card_exchange,
+                 'name': 'Exchange',
+                 'taken': False,
+                 'drawn': 3,
+                 'max': 3
+                 },
+             3: {
+                 'img': img_card_exterminate,
+                 'name': 'Exterminate',
+                 'taken': False,
+                 'drawn': 0,
+                 'max': 1
+                 },
+             4: {
+                 'img': img_card_extramile,
+                 'name': 'Extra Mile',
+                 'taken': False,
+                 'drawn': 0,
+                 'max': 2
+                 },
+             5: {
+                 'img': img_card_ghost,
+                 'name': 'Ghost',
+                 'taken': False,
+                 'drawn': 0,
+                 'max': 3
+                 },
+             6: {
+                 'img': img_card_heal,
+                 'name': 'Heal',
+                 'taken': False,
+                 'drawn': 0,
+                 'max': 1
+                 },
+             7: {
+                 'img': img_card_kamikaze,
+                 'name': 'Kamikaze',
+                 'taken': False,
+                 'drawn': 0,
+                 'max': 1
+                 },
+             8: {
+                 'img': img_card_multihit,
+                 'name': 'Multi-Hit',
+                 'taken': False,
+                 'drawn': 0,
+                 'max': 1
+                 },
+             9: {
+                 'img': img_card_mutiny,
+                 'name': 'Mutiny',
+                 'taken': False,
+                 'drawn': 0,
+                 'max': 1
+                 },
+             10: {
+                  'img': img_card_ghost,
+                  'name': 'Reach',
+                  'taken': False,
+                  'drawn': 0,
+                  'max': 2
+                  },
+             11: {
+                  'img': img_card_refund,
+                  'name': 'Refund',
+                  'taken': False,
+                  'drawn': 0,
+                  'max': 2
+                  },
+             12: {
+                  'img': img_card_reversal,
+                  'name': 'Reversal',
+                  'taken': False,
+                  'drawn': 0,
+                  'max': 2
+                  },
+             13: {
+                  'img': img_card_shield,
+                  'name': 'Shield',
+                  'taken': False,
+                  'drawn': 0,
+                  'max': 1
+                  },
+             14: {
+                  'img': img_card_skip,
+                  'name': 'Skip',
+                  'taken': False,
+                  'drawn': 0,
+                  'max': 2
+                  },
+             15: {
+                  'img': img_card_switcheroo,
+                  'name': 'Switcheroo',
+                  'taken': False,
+                  'drawn': 0,
+                  'max': 1
+                  },
+             16: {
+                  'img': img_card_take,
+                  'name': 'Take',
+                  'taken': False,
+                  'drawn': 0,
+                  'max': 1
+                  },
+             }
     
 ## --- MAIN SCREEN --- ##
 def throwDicePoints():
@@ -737,7 +958,7 @@ def drawCardPlayer(player):
 ## --- CARD FUNCTIONALITIES --- ##  
 def checkCard(player, index):
     global amountGained, currentPlayer, currentRound, enteredPlayers, activePlayers
-    specialCards = ['Heal', 'Extra Mile', 'Take', 'Exchange', 'Skip']
+    specialCards = ['Heal', 'Extra Mile', 'Take', 'Skip']
     
     if players[player]['cards'][index] == 'Heal' and players[player]['health'] != 3:
         healCard(player)
@@ -1304,9 +1525,11 @@ def drawRound(title):
 def drawBackground():
     image(img_bg, 0, 0, width, height)
     
+def drawBackgroundSecondary():
+    image(img_background_secondary, 0, 0, width, height)
+    
 def drawBackground2():
     image(img_bg2, 0, 0, width, height)
-    
     
     
 def drawCardsButton():
@@ -1338,6 +1561,9 @@ def drawExitButton():
 
 def drawCancelButton():
     image(img_btn_cancel, 975, 550, 204, 87)
+    
+def drawMenuButton():
+    image(img_btn_menu, 975, 550, 204, 87)
     
 def drawNumberBackground(x, y):
     image(img_btn_number, x, y)
@@ -1506,7 +1732,7 @@ def drawStartMenu():
     fill(255)
     textSize(24)
     textAlign(LEFT)
-    text('VERSION 0.4.0', 20, 1060)
+    text('VERSION 1.0.0', 20, 1060)
     
 ## boxes on the rules page
 def  drawRulesboxes():
@@ -1592,8 +1818,6 @@ def mousePressed():
     ## INPUT NAMES
     if currentScreen == 'INPUT-NAMES':
         if mouseX > 0 and mouseX < 1920 and mouseY > 0 and mouseY < 1080:
-            if soundfx == True: 
-                sfx.play()
             tooltips['notEnoughPlayers'] = False
         if mouseX > 50 and mouseX < 254 and mouseY > 50 and mouseY < 137: # BACK BUTTON
             if soundfx == True: 
@@ -1609,6 +1833,7 @@ def mousePressed():
             if soundfx == True: 
                 sfx.play()
             tooltips['notEnoughPlayers'] = True
+            notisfx.play()
         
         if mouseX > 810 and mouseX < 1460 and mouseY > 450 and mouseY < 525:
             if soundfx == True: 
@@ -1675,7 +1900,7 @@ def mousePressed():
                 if soundfx == True: 
                     sfx.play()
                 currentScreen = 'INPUT-NAMES'
-            if mouseX > 460 and mouseX < 664 and mouseY > 875 and mouseY < 962: # SHUFFLE BUTTON
+            if mouseX > 460 and mouseX < 664 and mouseY > 875 and mouseY < 962 and shuffled == False: # SHUFFLE BUTTON
                 if soundfx == True: 
                     sfx.play()
                 shuffled = True
@@ -1808,6 +2033,10 @@ def mousePressed():
                     if players[currentPlayer + i]['isDead'] == False and currentPlayer + i <= enteredPlayers:
                         currentPlayer = currentPlayer + i
                         break
+                    
+            if len(activePlayers) < 2:
+                currentScreen = 'WINNER'
+                winsfx.play()
         
         if mouseX > 400 and mouseX < 415 and mouseY > 915 and mouseY < 930: # PLAYER 1 PLUS BUTTON
             if soundfx == True: 
@@ -1847,6 +2076,10 @@ def mousePressed():
                     if players[currentPlayer + i]['isDead'] == False and currentPlayer + i <= enteredPlayers:
                         currentPlayer = currentPlayer + i
                         break
+                    
+            if len(activePlayers) < 2:
+                currentScreen = 'WINNER'
+                winsfx.play()
         
         if mouseX > 860 and mouseX < 875 and mouseY > 915 and mouseY < 930: # PLAYER 2 PLUS BUTTON
             if soundfx == True: 
@@ -1886,6 +2119,10 @@ def mousePressed():
                     if players[currentPlayer + i]['isDead'] == False and currentPlayer + i <= enteredPlayers:
                         currentPlayer = currentPlayer + i
                         break
+                    
+            if len(activePlayers) < 2:
+                currentScreen = 'WINNER'
+                winsfx.play()
         
         if mouseX > 1320 and mouseX < 1335 and mouseY > 915 and mouseY < 930: # PLAYER 3 PLUS BUTTON
             if soundfx == True: 
@@ -1925,6 +2162,10 @@ def mousePressed():
                     if players[currentPlayer + i]['isDead'] == False and currentPlayer + i <= enteredPlayers:
                         currentPlayer = currentPlayer + i
                         break
+                    
+            if len(activePlayers) < 2:
+                currentScreen = 'WINNER'
+                winsfx.play()
         
         if mouseX > 1780 and mouseX < 1795 and mouseY > 915 and mouseY < 930: # PLAYER 4 PLUS BUTTON
             if soundfx == True: 
@@ -1995,22 +2236,32 @@ def mousePressed():
                 sfx.play()
             troopSelected = 'SKELETON'
             selectedTroopPoints = 1
+        if mouseX > 0 and mouseX < 1920 and mouseY > 0 and mouseY < 1080:
+                tooltips['notEnoughPoints'] = False
         if mouseX > 1135 and mouseX < 1237 and mouseY > 966 and mouseY < 1010: # BUY BUTTON
             if soundfx == True: 
                 sfx.play()
             if troopSelected != '' and players[currentPlayer]['points'] >= selectedTroopPoints:
                 players[currentPlayer]['points'] -= selectedTroopPoints
-                
-
+                buysfx.play()
+            elif players[currentPlayer]['points'] < selectedTroopPoints:
+                tooltips['notEnoughPoints'] = True
+                notisfx.play()
             
     ## CARDS SCREEN
     elif currentScreen == 'CARDS':
+        if mouseX > 0 and mouseX < 1920 and mouseY > 0 and mouseY < 1080:
+                tooltips['notEnoughPoints'] = False
         if mouseX > 1135 and mouseX < 1237 and mouseY > 966 and mouseY < 1010: # BUY BUTTON
             if soundfx == True: 
                 sfx.play()
             if players[currentPlayer]['points'] >= 10 and len(players[currentPlayer]['cards']) < 3:
                 players[currentPlayer]['points'] -= 10
                 buyCard()
+                buysfx.play()
+            elif players[currentPlayer]['points'] < 10:
+                notisfx.play()
+                tooltips['notEnoughPoints'] = True
         if mouseX > 1666 and mouseX < 1870 and mouseY > 50 and mouseY < 137: # BACK BUTTON
             if soundfx == True: 
                 sfx.play()
@@ -2033,11 +2284,23 @@ def mousePressed():
         if mouseX > 725 and mouseX < 929 and mouseY > 550 and mouseY < 637: # EXIT BUTTON
             if soundfx == True: 
                 sfx.play()
-            exit() 
+                exit()
         if mouseX > 975 and mouseX < 1179 and mouseY > 550 and mouseY < 637: # CANCEL BUTTON
             if soundfx == True: 
                 sfx.play()
             currentScreen = lastScreen 
+            
+    elif currentScreen == 'WINNER':
+        if mouseX > 725 and mouseX < 929 and mouseY > 550 and mouseY < 637: # EXIT BUTTON
+            if soundfx == True: 
+                sfx.play()
+            exit() 
+        if mouseX > 975 and mouseX < 1179 and mouseY > 550 and mouseY < 637: # MAIN BUTTON
+            if soundfx == True: 
+                sfx.play()
+            currentScreen = 'MAIN-MENU'
+            lastScreen = 'MAIN-MENU'
+            resetGame()
     
     ## SETTINGS SCREEN
     elif currentScreen == 'SETTINGS':
@@ -2056,7 +2319,7 @@ def mousePressed():
             if soundfx == True: 
                 sfx.play()
             if isPlaying == False:
-                sf.play()
+                sf.loop()
                 isPlaying = True
         if mouseX > 1200 and mouseX < 1404 and mouseY > 330 and mouseY < 417: #MUSIC OFF
             if soundfx == True: 
@@ -2068,14 +2331,23 @@ def mousePressed():
             if soundfx == True: 
                 sfx.play()
             sf.amp(0.3)
+            sfx.amp(0.3)
+            buysfx.amp(0.3)
+            notisfx.amp(0.3)
         if mouseX > 1200 and mouseX < 1404 and mouseY > 430 and mouseY < 517: #VOLUME MEDIUM
             if soundfx == True: 
                 sfx.play()
             sf.amp(0.5)
+            sfx.amp(0.5)
+            buysfx.amp(0.5)
+            notisfx.amp(0.5)
         if mouseX > 1450 and mouseX < 1654 and mouseY > 430 and mouseY < 517: #VOLUME HIGH
             if soundfx == True: 
                 sfx.play()
             sf.amp(1)
+            sfx.amp(1)
+            buysfx.amp(1)
+            notisfx.amp(1)
         if mouseX > 950 and mouseX < 1154 and mouseY > 530 and mouseY < 617: #NOTIFICATIONS ON
             if soundfx == True:
                 sfx.play()
@@ -2125,7 +2397,7 @@ def mousePressed():
             if soundfx == True: 
                 sfx.play()
             if isPlaying == False:
-                sf.play()
+                sf.loop()
                 isPlaying = True
         if mouseX > 1200 and mouseX < 1404 and mouseY > 330 and mouseY < 417: #MUSIC OFF
             if soundfx == True: 
@@ -2864,6 +3136,7 @@ def drawboards():
 ## DRAW SCREENS
 def draw():
     global img_cursor, img_btn_roll
+    cursor(img_cursor, 16, 16)
     
     ## GLOBALS
     global currentRound, currentScreen, currentPlayer, activePlayers, shuffled, tooltips, font_kabel, shuffled, diceGained
@@ -2939,7 +3212,9 @@ def draw():
         drawDiceBoxBottom()
         drawCardsBuyButton()
         drawTroopsScreen()
-    
+        if tooltips['notEnoughPoints'] == True:
+            drawTooltip('NOT ENOUGH POINTS', 'YOU DO NOT HAVE ENOUGH POINTS TO BUY THIS TROOP')
+        
     ## CARDS SCREEN
     elif currentScreen == 'CARDS':
         drawBackground()
@@ -2949,7 +3224,9 @@ def draw():
         drawDiceBoxBottom()
         drawAllCards()
         drawCardsBuyButton()
-    
+        if tooltips['notEnoughPoints'] == True:
+            drawTooltip('NOT ENOUGH POINTS', 'YOU DO NOT HAVE ENOUGH POINTS TO BUY A CARD')
+                
     ## EXIT SCREEN
     elif currentScreen == 'EXIT':
         drawBackground()
@@ -2962,6 +3239,21 @@ def draw():
         text('DO YOU WANT TO EXIT?', 960, 480)
         drawExitButton()
         drawCancelButton()
+        
+    elif currentScreen == 'WINNER':
+        if len(activePlayers) != 0:
+            winner = activePlayers[0]
+            name = players[winner]['name']
+            drawBackgroundSecondary()
+            fill('#1a2236')
+            noStroke()
+            rect(460, 390, 1000, 300, 10)
+            textAlign(CENTER, CENTER)
+            fill('#1dc2ce')
+            textFont(font_kabel, 32)
+            text('CONGRATULATIONS! ' + name + ' you are the winner!', 960, 480)
+            drawExitButton()
+            drawMenuButton()
     
     ## SETTINGS SCREEN
     elif currentScreen == 'SETTINGS':
@@ -2985,8 +3277,6 @@ def draw():
         drawSoundButtons()
         drawSoundEffects()
         drawRound('SETTINGS')
-        
-        
         
     elif currentScreen == 'CONTACT':
         drawBackground()
@@ -3062,7 +3352,6 @@ def draw():
         drawBackButton()
         drawRound('WINNING')
         drawTextWinning()
-
         
     elif currentScreen == 'GAMEPLAY':
         drawBackground()
